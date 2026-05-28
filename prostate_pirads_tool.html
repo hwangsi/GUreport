@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prostate MRI Structured Report · PI-RADS v2.1</title>
+<style>
+/* ===== RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ===== DESIGN TOKENS (iOS Dark) ===== */
+:root {
+  --bg0:#000;--bg1:#1C1C1E;--bg2:#2C2C2E;--bg3:#3A3A3C;
+  --label1:#FFF;--label2:rgba(235,235,245,.6);--label3:rgba(235,235,245,.3);--label4:rgba(235,235,245,.16);
+  --fill1:rgba(120,120,128,.36);--fill2:rgba(120,120,128,.28);--fill3:rgba(118,118,128,.22);--fill4:rgba(116,116,128,.14);
+  --sep:rgba(84,84,88,.55);--sep-opaque:#38383A;
+  --blue:#0A84FF;--blue-bg:rgba(10,132,255,.18);
+  --green:#30D158;--green-bg:rgba(48,209,88,.18);
+  --red:#FF453A;--red-bg:rgba(255,69,58,.18);
+  --orange:#FF9F0A;--orange-bg:rgba(255,159,10,.14);
+  --purple:#BF5AF2;--purple-bg:rgba(191,90,242,.18);
+  --gray:#8E8E93;
+  --r-xs:8px;--r-sm:10px;--r-md:12px;--r-lg:16px;--r-xl:20px;--r-xxl:28px;
+  --shadow-card:0 1px 3px rgba(0,0,0,.35),0 4px 16px rgba(0,0,0,.22);
+  --shadow-btn:0 2px 6px rgba(0,0,0,.3);
+  --shadow-seg:0 2px 6px rgba(0,0,0,.28),0 1px 2px rgba(0,0,0,.2);
+}
+
+/* ===== BASE ===== */
+html { -webkit-text-size-adjust:100%; }
+body {
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Arial,sans-serif;
+  font-size:15px; background:var(--bg0); color:var(--label1);
+  line-height:1.45; -webkit-font-smoothing:antialiased;
+}
+label { cursor:pointer; }
+button,[role="button"] { -webkit-tap-highlight-color:transparent; touch-action:manipulation; -webkit-appearance:none; }
+label { -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+
+/* ===== LIGHT MODE ===== */
+body.light {
+  --bg0:#F2F2F7;--bg1:#FFF;--bg2:#F2F2F7;--bg3:#E5E5EA;
+  --label1:#000;--label2:rgba(60,60,67,.6);--label3:rgba(60,60,67,.3);--label4:rgba(60,60,67,.18);
+  --fill1:rgba(120,120,128,.2);--fill2:rgba(120,120,128,.16);--fill3:rgba(118,118,128,.12);--fill4:rgba(116,116,128,.08);
+  --sep:rgba(60,60,67,.29);--sep-opaque:#C6C6C8;
+  --blue:#007AFF;--blue-bg:rgba(0,122,255,.12);
+  --green:#34C759;--green-bg:rgba(52,199,89,.12);
+  --red:#FF3B30;--red-bg:rgba(255,59,48,.1);
+  --orange:#FF9500;--orange-bg:rgba(255,149,0,.1);
+  --purple:#AF52DE;--purple-bg:rgba(175,82,222,.12);
+  --shadow-card:0 1px 3px rgba(0,0,0,.10),0 4px 16px rgba(0,0,0,.07);
+  --shadow-btn:0 2px 6px rgba(0,0,0,.12);
+  --shadow-seg:0 2px 6px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.08);
+}
+body.light #top-bar { background:rgba(255,255,255,.85); border-bottom-color:rgba(60,60,67,.2); }
+
+/* ===== NAV BAR ===== */
+#top-bar {
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(28,28,30,.9);
+  backdrop-filter:saturate(180%) blur(40px);
+  -webkit-backdrop-filter:saturate(180%) blur(40px);
+  border-bottom:0.5px solid rgba(84,84,88,.4);
+  display:flex;align-items:center;
+  padding:0 16px;height:52px;gap:0;
+}
+.tab-btn {
+  padding:0 14px;height:52px;background:none;border:none;
+  border-bottom:2px solid transparent;cursor:pointer;
+  font-size:13px;font-weight:500;color:var(--label3);
+  letter-spacing:-.1px;transition:color .2s;font-family:inherit;
+}
+.tab-btn:active { opacity:.55; }
+.tab-btn.active { color:var(--blue);border-bottom-color:var(--blue);font-weight:600; }
+.top-spacer { flex:1; }
+.report-btn {
+  background:var(--blue);color:#fff;border:none;
+  padding:8px 18px;border-radius:20px;cursor:pointer;
+  font-size:14px;font-weight:600;letter-spacing:-.2px;
+  margin-right:8px;transition:opacity .15s;font-family:inherit;
+  box-shadow:var(--shadow-btn);
+}
+.report-btn:active { opacity:.72; }
+.reset-all-btn {
+  background:transparent;color:var(--red);border:none;
+  padding:8px 12px;border-radius:20px;cursor:pointer;
+  font-size:14px;font-weight:500;letter-spacing:-.1px;
+  transition:background .15s;font-family:inherit;
+}
+.reset-all-btn:active { background:rgba(255,69,58,.14); }
+.theme-toggle-btn {
+  background:var(--fill3);border:none;
+  width:34px;height:34px;border-radius:50%;
+  cursor:pointer;color:var(--label2);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s,color .15s;margin-left:4px;flex-shrink:0;
+}
+.theme-toggle-btn:active { background:var(--fill2); }
+.theme-toggle-btn svg { display:block; }
+
+/* ===== MAIN ===== */
+#main { margin-top:52px;padding:16px; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+/* ===== ACTION BAR ===== */
+.action-bar { display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-top:2px; }
+.pink-btn {
+  background:var(--red);color:#fff;border:none;
+  padding:10px 18px;border-radius:var(--r-md);
+  cursor:pointer;font-size:14px;font-weight:600;
+  letter-spacing:-.2px;transition:opacity .15s;
+  font-family:inherit;min-height:44px;box-shadow:var(--shadow-btn);
+}
+.pink-btn:active { opacity:.72; }
+.blue-btn {
+  background:var(--blue);color:#fff;border:none;
+  padding:10px 18px;border-radius:var(--r-md);
+  cursor:pointer;font-size:14px;font-weight:600;
+  letter-spacing:-.2px;transition:opacity .15s;
+  font-family:inherit;min-height:44px;box-shadow:var(--shadow-btn);
+}
+.blue-btn:active { opacity:.72; }
+
+/* ===== CARDS ===== */
+.table-card {
+  background:var(--bg1);border-radius:var(--r-lg);
+  margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow-card);
+}
+
+/* ===== DATA TABLE ===== */
+table.data-table { border-collapse:collapse;width:100%;background:var(--bg1); }
+table.data-table th,table.data-table td { padding:13px 16px;vertical-align:middle;border-bottom:.5px solid var(--sep); }
+table.data-table tbody tr:last-child td { border-bottom:none; }
+table.data-table th {
+  background:var(--bg2);color:var(--label1);text-align:center;
+  font-weight:600;font-size:13px;letter-spacing:-.1px;
+  border-bottom:.5px solid var(--sep);
+}
+table.data-table td.label-cell {
+  background:var(--bg1);font-weight:500;width:165px;
+  font-size:13px;color:var(--label2);
+  border-right:.5px solid rgba(84,84,88,.3);
+  line-height:1.35;vertical-align:top;padding-top:14px;
+}
+
+/* ===== SEGMENTED CONTROL ===== */
+.radio-group {
+  display:inline-flex;flex-wrap:wrap;
+  background:var(--fill3);border-radius:var(--r-md);padding:3px;gap:2px;
+}
+.radio-group label {
+  position:relative;display:flex;align-items:center;justify-content:center;
+  padding:9px 18px;border-radius:10px;cursor:pointer;
+  font-size:14px;font-weight:500;color:var(--label2);
+  transition:background .18s,color .18s,box-shadow .18s;
+  white-space:nowrap;user-select:none;min-height:44px;letter-spacing:-.1px;
+}
+.radio-group input[type=radio],.radio-group input[type=checkbox] {
+  position:absolute;opacity:0;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);
+}
+.radio-group label:has(input:checked) {
+  background:var(--blue);color:#fff;font-weight:600;box-shadow:var(--shadow-seg);
+}
+.radio-group label:active:not(:has(input:checked)) { background:rgba(255,255,255,.09); }
+
+/* ===== INPUTS ===== */
+input[type=text] {
+  padding:9px 11px;border:none;border-radius:var(--r-sm);
+  font-size:15px;background:var(--fill3);color:var(--label1);
+  font-family:inherit;transition:box-shadow .15s;
+}
+input[type=text]::placeholder { color:var(--label3); }
+input[type=text]:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45);background:var(--fill2); }
+select {
+  padding:9px 11px;border:none;border-radius:var(--r-sm);
+  font-size:15px;background:var(--fill3);cursor:pointer;
+  color:var(--label1);font-family:inherit;transition:box-shadow .15s;
+}
+select option { background:var(--bg2);color:var(--label1); }
+select:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45); }
+textarea {
+  padding:10px 12px;border:none;border-radius:var(--r-sm);
+  font-size:15px;resize:vertical;font-family:inherit;
+  background:var(--fill3);color:var(--label1);transition:box-shadow .15s;
+}
+textarea::placeholder { color:var(--label3); }
+textarea:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45); }
+
+/* ===== SECTION TITLE BAR ===== */
+.section-title-bar {
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:8px;padding:2px 2px 0;
+}
+.section-title-text {
+  font-size:17px;font-weight:700;color:var(--label1);letter-spacing:-.3px;
+}
+
+/* ===== LESION CARD ===== */
+.lesion-item {
+  margin-bottom:12px;border-radius:var(--r-lg);overflow:hidden;
+  box-shadow:var(--shadow-card);
+}
+.lesion-header {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;background:var(--bg2);
+}
+.lesion-header-left { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+.lesion-title { font-size:14px;font-weight:700;color:var(--label1);letter-spacing:-.2px; }
+.del-lesion-btn {
+  background:rgba(255,69,58,.12);color:var(--red);border:none;
+  border-radius:var(--r-xs);padding:7px 13px;
+  cursor:pointer;font-size:13px;font-weight:600;
+  transition:background .15s,color .15s;font-family:inherit;flex-shrink:0;
+}
+.del-lesion-btn:active { background:var(--red);color:#fff; }
+.lesion-table { border-collapse:collapse;width:100%;background:var(--bg1); }
+.lesion-label-cell {
+  width:160px;font-weight:500;font-size:13px;
+  padding:12px 14px;border-bottom:.5px solid var(--sep);
+  border-right:.5px solid rgba(84,84,88,.3);
+  color:var(--label2);vertical-align:top;
+  background:var(--bg1);line-height:1.35;word-break:break-word;
+}
+.lesion-data-cell {
+  padding:10px 12px;border-bottom:.5px solid var(--sep);
+  background:var(--bg1);color:var(--label1);
+}
+.lesion-table tbody tr:last-child td { border-bottom:none; }
+.add-lesion-btn {
+  width:100%;padding:14px 10px;margin-top:4px;margin-bottom:24px;
+  background:rgba(10,132,255,.07);
+  border:1.5px dashed rgba(10,132,255,.38);
+  cursor:pointer;font-size:15px;border-radius:var(--r-lg);
+  color:var(--blue);font-weight:600;letter-spacing:-.2px;
+  transition:background .15s,border-color .15s;
+  font-family:inherit;min-height:52px;-webkit-appearance:none;
+}
+.add-lesion-btn:active { background:rgba(10,132,255,.14);border-color:var(--blue); }
+.no-lesions-msg {
+  text-align:center;padding:24px 16px;color:var(--label3);font-size:14px;
+  background:var(--bg1);border-radius:var(--r-lg);margin-bottom:8px;
+  box-shadow:var(--shadow-card);
+}
+
+/* ===== PI-RADS BADGES ===== */
+.pirads-badge {
+  font-weight:700;font-size:11px;padding:3px 9px;border-radius:20px;
+  letter-spacing:0;font-variant-numeric:tabular-nums;
+}
+.pirads-5 { color:var(--red);background:var(--red-bg); }
+.pirads-4 { color:var(--orange);background:var(--orange-bg); }
+.pirads-3 { color:var(--green);background:var(--green-bg); }
+.pirads-2,.pirads-1 { color:var(--blue);background:var(--blue-bg); }
+.index-badge {
+  background:var(--orange-bg);color:var(--orange);
+  font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;
+  letter-spacing:.2px;
+}
+
+/* ===== SECTOR MAP ===== */
+.sector-panels {
+  display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;
+}
+.sector-panel { flex:0 0 calc(33% - 4px);min-width:110px; }
+.sector-panel-title {
+  text-align:center;font-weight:700;font-size:11px;
+  color:var(--label2);padding:4px 0 2px;letter-spacing:.3px;text-transform:uppercase;
+}
+.sector-rl-label {
+  display:flex;justify-content:space-between;padding:0 2px 2px;
+  font-size:9px;color:var(--label3);font-weight:700;letter-spacing:.5px;
+}
+.sector-grid {
+  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;
+}
+/* sector cells */
+.sc {
+  min-height:28px;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:600;border-radius:4px;cursor:pointer;
+  user-select:none;transition:opacity .15s;text-align:center;
+  padding:2px 1px;-webkit-tap-highlight-color:transparent;
+  letter-spacing:-.2px;
+}
+.sc:active:not(.empty) { opacity:.65; }
+.sc.span2 { grid-column:span 2; }
+.sc.pz { background:var(--blue-bg);color:var(--blue); }
+.sc.tz { background:var(--green-bg);color:var(--green); }
+.sc.cz { background:var(--purple-bg);color:var(--purple); }
+.sc.afs { background:var(--fill3);color:var(--label3); }
+.sc.empty { background:transparent;cursor:default;pointer-events:none; }
+.sc.selected.pz { background:var(--blue);color:#fff; }
+.sc.selected.tz { background:var(--green);color:#fff; }
+.sc.selected.cz { background:var(--purple);color:#fff; }
+.sc.selected.afs { background:var(--gray);color:#fff; }
+/* orientation hint */
+.sector-orient {
+  display:flex;justify-content:space-between;padding:2px 2px 0;
+  font-size:9px;color:var(--label3);letter-spacing:.2px;
+}
+
+/* ===== SECTOR CHIPS ===== */
+.sector-chips { display:flex;flex-wrap:wrap;gap:4px;margin-top:6px; }
+.sector-chip {
+  background:var(--blue-bg);color:var(--blue);
+  font-size:11px;font-weight:600;padding:3px 8px;border-radius:12px;
+}
+.sector-chip-empty { font-size:12px;color:var(--label3);font-style:italic; }
+
+/* ===== CALC DISPLAY ===== */
+.calc-row {
+  display:flex;align-items:center;gap:6px;margin-top:6px;
+  padding:5px 8px;background:var(--fill4);border-radius:6px;
+}
+.calc-label { font-size:11px;color:var(--label3); }
+.calc-value { font-size:13px;font-weight:700;color:var(--blue);font-variant-numeric:tabular-nums; }
+.calc-unit { font-size:11px;color:var(--label3); }
+
+/* ===== DIALOGS ===== */
+.dialog-overlay {
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.55);z-index:200;
+  align-items:flex-end;justify-content:center;
+  backdrop-filter:saturate(160%) blur(28px);
+  -webkit-backdrop-filter:saturate(160%) blur(28px);
+}
+.dialog-overlay.show { display:flex; }
+.dialog-box {
+  background:var(--bg1);border-radius:var(--r-xl) var(--r-xl) 0 0;
+  padding:8px 20px 36px;width:100%;max-width:780px;
+  max-height:88vh;display:flex;flex-direction:column;
+  box-shadow:0 -2px 40px rgba(0,0,0,.55);
+}
+.dialog-box::before {
+  content:'';display:block;width:34px;height:4px;
+  background:var(--fill1);border-radius:2px;
+  margin:8px auto 14px;flex-shrink:0;
+}
+.dialog-title {
+  font-size:17px;font-weight:700;margin-bottom:12px;
+  color:var(--label1);letter-spacing:-.3px;
+  padding-bottom:12px;border-bottom:.5px solid var(--sep);
+}
+.dialog-body {
+  flex:1;overflow-y:auto;font-size:13px;line-height:1.75;
+  padding:14px;border-radius:var(--r-sm);background:var(--bg0);
+  white-space:pre-wrap;
+  font-family:'SF Mono','Menlo','Courier New',monospace;
+  color:var(--label1);
+}
+.dialog-actions { display:flex;gap:8px;margin-top:14px;justify-content:flex-end;align-items:center; }
+.copy-feedback { font-size:13px;color:var(--green);align-self:center;margin-right:auto;font-weight:600; }
+#confirmDialog.dialog-overlay { align-items:center; }
+#confirmDialog .dialog-box {
+  border-radius:var(--r-xl);max-width:300px;align-self:center;
+  padding:22px 20px 20px;box-shadow:0 8px 40px rgba(0,0,0,.7);
+}
+#confirmDialog .dialog-box::before { display:none; }
+
+/* ===== FOOTER ===== */
+#app-footer {
+  text-align:center;padding:36px 16px 52px;
+  color:var(--label3);font-size:12px;line-height:1.8;
+  letter-spacing:-.1px;border-top:.5px solid var(--sep);margin-top:16px;
+}
+#app-footer .footer-name { color:var(--label2);font-weight:600;font-size:13px; }
+#app-footer .footer-sub { color:var(--label3);font-size:11px;margin-top:2px; }
+
+/* ===== MOBILE ===== */
+@media (max-width:680px) {
+  #top-bar { height:auto;padding:0 10px 8px;flex-wrap:wrap;gap:0; }
+  .tab-btn { flex:1;height:44px;padding:0 6px;font-size:12px;border-bottom-width:2px;min-width:0; }
+  .top-spacer { flex-basis:100%;height:0;flex-shrink:0; }
+  .report-btn { flex:1;margin:6px 6px 0 0;padding:10px;font-size:14px; }
+  .reset-all-btn { flex-shrink:0;margin:6px 0 0;padding:10px 14px;font-size:14px; }
+  .theme-toggle-btn { margin:6px 0 0; }
+  #main { padding:12px; }
+  .action-bar { flex-wrap:wrap; }
+  table.data-table td.label-cell { width:100px !important;font-size:12px;padding:10px 8px; }
+  table.data-table td { padding:10px; }
+  .lesion-label-cell { width:110px !important;font-size:12px;padding:10px 8px; }
+  input[type=text],select,textarea { font-size:16px !important; }
+  input[type=text] { padding:10px 11px;min-height:44px; }
+  select { padding:10px 11px;min-height:44px; }
+  .dialog-box { padding:8px 16px 44px;max-height:93vh; }
+  .dialog-body { font-size:12px;padding:12px; }
+  .dialog-actions { flex-wrap:wrap; }
+  .sc { min-height:26px;font-size:9px; }
+}
+@media (max-width:390px) {
+  .tab-btn { font-size:10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="top-bar">
+  <button class="tab-btn active" onclick="switchTab('prostate')" id="tab-prostate">Prostate</button>
+  <button class="tab-btn" onclick="switchTab('other')" id="tab-other">Other findings</button>
+  <div class="top-spacer"></div>
+  <button class="report-btn" onclick="generateReport()">판독문</button>
+  <button class="reset-all-btn" onclick="confirmResetAll()">전체 초기화</button>
+  <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="다크/라이트 모드 전환">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><path d="M12 2v2.5M12 19.5V22M4.22 4.22l1.77 1.77M18.01 18.01l1.77 1.77M2 12h2.5M19.5 12H22M4.22 19.78l1.77-1.77M18.01 5.99l1.77-1.77" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="main">
+
+  <!-- ======== TAB 1: PROSTATE ======== -->
+  <div class="tab-content active" id="tab-content-prostate">
+    <div class="action-bar">
+      <button class="pink-btn" onclick="resetProstate()">Prostate 초기화</button>
+    </div>
+
+    <!-- Clinical Information -->
+    <div class="table-card"><table class="data-table">
+      <thead><tr><th colspan="2">Clinical Information</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="label-cell">Previous biopsy history</td>
+          <td>
+            <div class="radio-group">
+              <label><input type="radio" name="prevBiopsy" value="yes" onchange="state.prevBiopsy=this.value;saveState()"> yes</label>
+              <label><input type="radio" name="prevBiopsy" value="no" onchange="state.prevBiopsy=this.value;saveState()"> no</label>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">Prostate cancer</td>
+          <td>
+            <div class="radio-group">
+              <label><input type="radio" name="prostateCancer" value="confirmed" onchange="state.prostateCancer=this.value;saveState()"> confirmed</label>
+              <label><input type="radio" name="prostateCancer" value="not confirmed" onchange="state.prostateCancer=this.value;saveState()"> not confirmed</label>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">Biopsy results</td>
+          <td>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <span style="font-size:13px;color:var(--label2);">Positive core(s):</span>
+                <input type="text" id="positiveCore" placeholder="" style="width:140px" oninput="state.positiveCore=this.value;saveState()">
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <span style="font-size:13px;color:var(--label2);">Gleason score:</span>
+                <input type="text" id="gleasonScore" placeholder="" style="width:140px" oninput="state.gleasonScore=this.value;saveState()">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">Active surveillance</td>
+          <td>
+            <input type="text" id="activeSurveillance" placeholder="" style="width:220px" oninput="state.activeSurveillance=this.value;saveState()">
+          </td>
+        </tr>
+      </tbody>
+    </table></div>
+
+    <!-- Techniques -->
+    <div class="table-card"><table class="data-table">
+      <thead><tr><th colspan="2">Techniques</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="label-cell">Protocol</td>
+          <td>
+            <textarea id="techniques" rows="2" style="width:100%" oninput="state.techniques=this.value;saveState()"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">IV contrast media administration</td>
+          <td>
+            <div class="radio-group">
+              <label><input type="radio" name="ivContrast" value="yes" onchange="state.ivContrast=this.value;saveState()"> yes</label>
+              <label><input type="radio" name="ivContrast" value="no" onchange="state.ivContrast=this.value;saveState()"> no</label>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table></div>
+
+    <!-- Measurements -->
+    <div class="table-card"><table class="data-table">
+      <thead><tr><th colspan="2">Measurements</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="label-cell">Prostate dimensions<br><span style="font-size:11px;font-weight:400;color:var(--label3)">(mm)</span></td>
+          <td>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                <span style="font-size:13px;color:var(--label2);">L</span>
+                <input type="text" id="dim-L" inputmode="decimal" placeholder="L" style="width:58px" oninput="state.dimL=this.value;saveState();updateCalcDisplay()">
+                <span style="color:var(--label3);">×</span>
+                <span style="font-size:13px;color:var(--label2);">W</span>
+                <input type="text" id="dim-W" inputmode="decimal" placeholder="W" style="width:58px" oninput="state.dimW=this.value;saveState();updateCalcDisplay()">
+                <span style="color:var(--label3);">×</span>
+                <span style="font-size:13px;color:var(--label2);">H</span>
+                <input type="text" id="dim-H" inputmode="decimal" placeholder="H" style="width:58px" oninput="state.dimH=this.value;saveState();updateCalcDisplay()">
+                <span style="font-size:13px;color:var(--label3);">mm</span>
+              </div>
+              <div class="calc-row">
+                <span class="calc-label">Estimated volume:</span>
+                <span class="calc-value" id="calc-volume">—</span>
+                <span class="calc-unit">cc</span>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">PSA (ng/mL)</td>
+          <td>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <input type="text" id="psa" inputmode="decimal" placeholder="PSA" style="width:100px" oninput="state.psa=this.value;saveState();updateCalcDisplay()">
+              <div class="calc-row">
+                <span class="calc-label">PSAD:</span>
+                <span class="calc-value" id="calc-psad">—</span>
+                <span class="calc-unit">ng/mL/cc</span>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="label-cell">Membranous urethral length (mm)</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input type="text" id="mul" inputmode="decimal" placeholder="mm" style="width:80px" oninput="state.mul=this.value;saveState()">
+              <span style="font-size:13px;color:var(--label3);">mm</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table></div>
+
+    <!-- PI-RADS Lesions -->
+    <div class="section-title-bar">
+      <span class="section-title-text">PI-RADS Lesions</span>
+    </div>
+    <div id="lesion-container"></div>
+    <button class="add-lesion-btn" onclick="addLesion()">+ Add Lesion</button>
+
+  </div><!-- end tab-content-prostate -->
+
+  <!-- ======== TAB 2: OTHER FINDINGS ======== -->
+  <div class="tab-content" id="tab-content-other">
+    <div class="action-bar">
+      <button class="pink-btn" onclick="resetOther()">Other findings 초기화</button>
+    </div>
+    <div class="table-card"><table class="data-table">
+      <thead><tr><th colspan="2">Other findings</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="label-cell">Seminal vesicle invasion</td>
+          <td><textarea id="svi" rows="2" style="width:100%" oninput="state.svi=this.value;saveState()"></textarea></td>
+        </tr>
+        <tr>
+          <td class="label-cell">Abnormality of the urinary bladder</td>
+          <td><textarea id="bladder" rows="2" style="width:100%" oninput="state.bladder=this.value;saveState()"></textarea></td>
+        </tr>
+        <tr>
+          <td class="label-cell">Invasion to adjacent organ</td>
+          <td><textarea id="adjacentOrgan" rows="2" style="width:100%" oninput="state.adjacentOrgan=this.value;saveState()"></textarea></td>
+        </tr>
+        <tr>
+          <td class="label-cell">Significant lymph node enlargement</td>
+          <td><textarea id="lymphNode" rows="2" style="width:100%" oninput="state.lymphNode=this.value;saveState()"></textarea></td>
+        </tr>
+        <tr>
+          <td class="label-cell">Bone metastases</td>
+          <td><textarea id="bone" rows="2" style="width:100%" oninput="state.bone=this.value;saveState()"></textarea></td>
+        </tr>
+        <tr>
+          <td class="label-cell">Miscellaneous</td>
+          <td><textarea id="misc" rows="2" style="width:100%" oninput="state.misc=this.value;saveState()"></textarea></td>
+        </tr>
+      </tbody>
+    </table></div>
+  </div><!-- end tab-content-other -->
+
+</div><!-- end main -->
+
+<!-- FOOTER -->
+<footer id="app-footer">
+  <div class="footer-name">Hunjong Lim, MD</div>
+  <div class="footer-sub">Prostate MRI Structured Report · PI-RADS v2.1</div>
+  <div class="footer-sub" style="margin-top:4px;">© 2025 All rights reserved</div>
+</footer>
+
+<!-- REPORT DIALOG -->
+<div class="dialog-overlay" id="reportDialog">
+  <div class="dialog-box">
+    <div class="dialog-title">판독문 (Radiology Report)</div>
+    <div class="dialog-body" id="reportContent"></div>
+    <div class="dialog-actions">
+      <span class="copy-feedback" id="copyFeedback"></span>
+      <button class="blue-btn" onclick="copyReport()">Copy to Clipboard</button>
+      <button class="pink-btn" onclick="closeDialog('reportDialog')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ERROR DIALOG -->
+<div class="dialog-overlay" id="errorDialog">
+  <div class="dialog-box" style="max-width:500px;">
+    <div class="dialog-title">Validation Error</div>
+    <div class="dialog-body" id="errorContent" style="font-family:inherit;white-space:normal;background:transparent;padding:0;"></div>
+    <div class="dialog-actions">
+      <button class="pink-btn" onclick="closeDialog('errorDialog')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="dialog-overlay" id="confirmDialog">
+  <div class="dialog-box">
+    <div class="dialog-title">전체 초기화</div>
+    <div class="dialog-body" style="font-family:inherit;font-size:15px;background:transparent;padding:0 0 4px;color:var(--label2);line-height:1.55;white-space:normal;">
+      모든 입력 데이터가 삭제됩니다. 이 작업은 되돌릴 수 없습니다.
+    </div>
+    <div class="dialog-actions">
+      <button class="blue-btn" onclick="closeDialog('confirmDialog')">취소</button>
+      <button class="pink-btn" onclick="doResetAll()">초기화</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// SECTOR DATA MODEL
+// PI-RADS v2.1: 38 prostate sectors (base=14, mid=12, apex=12)
+// Key format: "${level}_${region}_${side}"
+// Display:   "Rt base PZpm" / "Lt mid TZa"
+// Sort order: level(base→mid→apex) → side(R→L) → region index
+// =====================================================================
+const LEVEL_ORDER = ['base','mid','apex'];
+const REGION_ORDER = ['PZa','PZpm','PZpl','TZa','TZp','CZ','AFS'];
+
+function sectorLabel(key) {
+  const parts = key.split('_');
+  // key format: level_region_side (region may contain no underscore)
+  const side = parts[parts.length - 1];
+  const level = parts[0];
+  const region = parts.slice(1, parts.length - 1).join('_');
+  return (side === 'R' ? 'Rt' : 'Lt') + ' ' + level + ' ' + region;
+}
+
+function sectorKey(level, region, side) {
+  return level + '_' + region + '_' + side;
+}
+
+function sortSectors(sectors) {
+  return [...sectors].sort((a, b) => {
+    const ap = a.split('_'), bp = b.split('_');
+    const aLevel = ap[0], bLevel = bp[0];
+    const aSide = ap[ap.length-1], bSide = bp[bp.length-1];
+    const aRegion = ap.slice(1, ap.length-1).join('_');
+    const bRegion = bp.slice(1, bp.length-1).join('_');
+    const li = LEVEL_ORDER.indexOf(aLevel) - LEVEL_ORDER.indexOf(bLevel);
+    if (li !== 0) return li;
+    const si = (aSide === 'R' ? 0 : 1) - (bSide === 'R' ? 0 : 1);
+    if (si !== 0) return si;
+    return REGION_ORDER.indexOf(aRegion) - REGION_ORDER.indexOf(bRegion);
+  });
+}
+
+// =====================================================================
+// STATE
+// =====================================================================
+const DEFAULT_TECHNIQUES = 'Axial DWI, axial T1WI, T2WI (axial, sagittal, coronal), axial DCE MRI, axial contrast-enhanced T1WI';
+
+const defaultState = {
+  activeTab: 'prostate',
+  prevBiopsy: '',
+  prostateCancer: '',
+  positiveCore: '',
+  gleasonScore: '',
+  activeSurveillance: '',
+  techniques: DEFAULT_TECHNIQUES,
+  ivContrast: 'yes',
+  dimL: '', dimW: '', dimH: '',
+  psa: '',
+  mul: '',
+  lesions: [],
+  svi: 'none',
+  bladder: 'none',
+  adjacentOrgan: 'none',
+  lymphNode: 'none',
+  bone: 'none',
+  misc: 'none'
+};
+
+function defaultLesion() {
+  return { sectors: [], pirads: '', maxLength: '', epe: 'none', comment: '' };
+}
+
+let state = JSON.parse(JSON.stringify(defaultState));
+
+function deepMerge(target, source) {
+  for (const key in source) {
+    if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      if (!target[key] || typeof target[key] !== 'object') target[key] = {};
+      deepMerge(target[key], source[key]);
+    } else {
+      target[key] = source[key];
+    }
+  }
+  return target;
+}
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('prostateReport_v1');
+    if (s) state = deepMerge(JSON.parse(JSON.stringify(defaultState)), JSON.parse(s));
+  } catch(e) {}
+}
+
+function saveState() {
+  try { localStorage.setItem('prostateReport_v1', JSON.stringify(state)); } catch(e) {}
+}
+
+// =====================================================================
+// CALCULATIONS
+// ellipsoid formula: volume_cc = L_mm × W_mm × H_mm × 0.52 / 1000
+// =====================================================================
+function calcVolume() {
+  const l = parseFloat(state.dimL), w = parseFloat(state.dimW), h = parseFloat(state.dimH);
+  if (!isNaN(l) && !isNaN(w) && !isNaN(h) && l > 0 && w > 0 && h > 0) {
+    return (l * w * h * 0.52) / 1000;
+  }
+  return null;
+}
+
+function calcPSAD() {
+  const vol = calcVolume();
+  const psa = parseFloat(state.psa);
+  if (vol !== null && !isNaN(psa) && psa >= 0) return psa / vol;
+  return null;
+}
+
+function updateCalcDisplay() {
+  const vol = calcVolume();
+  const psad = calcPSAD();
+  const volEl = document.getElementById('calc-volume');
+  const psadEl = document.getElementById('calc-psad');
+  if (vol !== null) {
+    volEl.textContent = vol.toFixed(1);
+    volEl.style.color = '';
+  } else {
+    volEl.textContent = '—';
+    volEl.style.color = 'var(--label3)';
+  }
+  if (psad !== null) {
+    psadEl.textContent = psad.toFixed(2);
+    psadEl.style.color = '';
+  } else {
+    psadEl.textContent = '—';
+    psadEl.style.color = 'var(--label3)';
+  }
+}
+
+// =====================================================================
+// INDEX LESION
+// Highest PIRADS score → tie-break: longest maxLength
+// Only lesions with pirads or sectors count as candidates
+// =====================================================================
+function getIndexLesionIdx() {
+  const candidates = state.lesions
+    .map((l, i) => ({...l, _i: i}))
+    .filter(l => l.pirads !== '' || l.sectors.length > 0);
+  if (candidates.length === 0) return -1;
+  candidates.sort((a, b) => {
+    const sa = parseInt(a.pirads) || 0, sb = parseInt(b.pirads) || 0;
+    if (sb !== sa) return sb - sa;
+    return (parseFloat(b.maxLength) || 0) - (parseFloat(a.maxLength) || 0);
+  });
+  return candidates[0]._i;
+}
+
+// =====================================================================
+// SECTOR MAP RENDERING (HTML string, one panel at a time)
+// =====================================================================
+function zoneOf(region) {
+  if (region === 'CZ') return 'cz';
+  if (region === 'AFS') return 'afs';
+  if (region.startsWith('TZ')) return 'tz';
+  return 'pz';
+}
+
+function makeCell(key, label, zone, span, lidx, selectedArr) {
+  if (!key) return '<div class="sc empty' + (span === 2 ? ' span2' : '') + '"></div>';
+  const selClass = selectedArr.includes(key) ? ' selected' : '';
+  const spanClass = span === 2 ? ' span2' : '';
+  return '<div class="sc ' + zone + spanClass + selClass + '" data-key="' + key + '" data-lidx="' + lidx + '" onclick="toggleSector(' + lidx + ',\'' + key + '\')">' + label + '</div>';
+}
+
+function renderSectorPanel(level, lidx) {
+  const sel = (state.lesions[lidx] || {sectors:[]}).sectors;
+  const cap = level.charAt(0).toUpperCase() + level.slice(1);
+  const hasCZ = (level === 'base');
+
+  let g = '';
+  // Row 1: AFS (span 2 each)
+  g += makeCell(sectorKey(level,'AFS','R'), 'AFS', 'afs', 2, lidx, sel);
+  g += makeCell(sectorKey(level,'AFS','L'), 'AFS', 'afs', 2, lidx, sel);
+  // Row 2: PZa, TZa, TZa, PZa
+  g += makeCell(sectorKey(level,'PZa','R'), 'PZa', 'pz', 1, lidx, sel);
+  g += makeCell(sectorKey(level,'TZa','R'), 'TZa', 'tz', 1, lidx, sel);
+  g += makeCell(sectorKey(level,'TZa','L'), 'TZa', 'tz', 1, lidx, sel);
+  g += makeCell(sectorKey(level,'PZa','L'), 'PZa', 'pz', 1, lidx, sel);
+  // Row 3: PZpl, TZp, TZp, PZpl
+  g += makeCell(sectorKey(level,'PZpl','R'), 'PZpl', 'pz', 1, lidx, sel);
+  g += makeCell(sectorKey(level,'TZp','R'), 'TZp', 'tz', 1, lidx, sel);
+  g += makeCell(sectorKey(level,'TZp','L'), 'TZp', 'tz', 1, lidx, sel);
+  g += makeCell(sectorKey(level,'PZpl','L'), 'PZpl', 'pz', 1, lidx, sel);
+  // Row 4 (base only): empty, CZ, CZ, empty
+  if (hasCZ) {
+    g += makeCell(null, '', '', 1, lidx, sel);
+    g += makeCell(sectorKey(level,'CZ','R'), 'CZ', 'cz', 1, lidx, sel);
+    g += makeCell(sectorKey(level,'CZ','L'), 'CZ', 'cz', 1, lidx, sel);
+    g += makeCell(null, '', '', 1, lidx, sel);
+  }
+  // Row 5: PZpm (span 2 each)
+  g += makeCell(sectorKey(level,'PZpm','R'), 'PZpm', 'pz', 2, lidx, sel);
+  g += makeCell(sectorKey(level,'PZpm','L'), 'PZpm', 'pz', 2, lidx, sel);
+
+  return '<div class="sector-panel">' +
+    '<div class="sector-panel-title">' + cap + '</div>' +
+    '<div class="sector-rl-label"><span>← R</span><span>L →</span></div>' +
+    '<div class="sector-orient"><span style="font-size:9px;color:var(--label3)">Ant↑</span><span style="font-size:9px;color:var(--label3)">Post↓</span></div>' +
+    '<div class="sector-grid">' + g + '</div>' +
+    '</div>';
+}
+
+// =====================================================================
+// LESION CARD RENDERING
+// =====================================================================
+function piradsBadgeClass(score) {
+  const n = parseInt(score);
+  if (n === 5) return 'pirads-5';
+  if (n === 4) return 'pirads-4';
+  if (n === 3) return 'pirads-3';
+  if (n <= 2 && n >= 1) return 'pirads-2';
+  return '';
+}
+
+function renderChipsHtml(sectors) {
+  const sorted = sortSectors(sectors);
+  if (sorted.length === 0) return '<span class="sector-chip-empty">No sector selected</span>';
+  return sorted.map(k => '<span class="sector-chip">' + sectorLabel(k) + '</span>').join('');
+}
+
+function renderLesionCard(idx) {
+  const les = state.lesions[idx];
+  const indexIdx = getIndexLesionIdx();
+  const isIndex = (indexIdx === idx);
+  const badgeClass = piradsBadgeClass(les.pirads);
+  const badgeHtml = les.pirads ? '<span class="pirads-badge ' + badgeClass + '">PI-RADS ' + les.pirads + '</span>' : '';
+  const indexHtml = isIndex ? '<span class="index-badge">Index</span>' : '';
+
+  const epeOptions = ['none','possible','definite'].map(v =>
+    '<label><input type="radio" name="epe_' + idx + '" value="' + v + '"' + (les.epe === v ? ' checked' : '') +
+    ' onchange="updateLesionField(' + idx + ',\'epe\',this.value)"> ' + v + '</label>'
+  ).join('');
+
+  const piradOptions = [1,2,3,4,5].map(n =>
+    '<option value="' + n + '"' + (les.pirads == n ? ' selected' : '') + '>' + n + '</option>'
+  ).join('');
+
+  return '<div class="lesion-item" id="lesion-card-' + idx + '">' +
+    '<div class="lesion-header">' +
+      '<div class="lesion-header-left" id="lesion-hdr-left-' + idx + '">' +
+        '<span class="lesion-title">Abnormality No.' + (idx+1) + '</span>' +
+        badgeHtml + indexHtml +
+      '</div>' +
+      '<button class="del-lesion-btn" onclick="deleteLesion(' + idx + ')">✕ Delete</button>' +
+    '</div>' +
+    '<table class="lesion-table"><tbody>' +
+      '<tr>' +
+        '<td class="lesion-label-cell">Location<br><span style="font-size:10px;font-weight:400;color:var(--label3)">(click cells)</span></td>' +
+        '<td class="lesion-data-cell">' +
+          '<div class="sector-panels">' +
+            renderSectorPanel('base', idx) +
+            renderSectorPanel('mid', idx) +
+            renderSectorPanel('apex', idx) +
+          '</div>' +
+          '<div class="sector-chips" id="chips-' + idx + '">' + renderChipsHtml(les.sectors) + '</div>' +
+        '</td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td class="lesion-label-cell">PI-RADS score</td>' +
+        '<td class="lesion-data-cell">' +
+          '<select onchange="updateLesionField(' + idx + ',\'pirads\',this.value)">' +
+            '<option value="">-- Select --</option>' + piradOptions +
+          '</select>' +
+        '</td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td class="lesion-label-cell">Maximal tumor length</td>' +
+        '<td class="lesion-data-cell">' +
+          '<div style="display:flex;align-items:center;gap:6px;">' +
+            '<input type="text" inputmode="decimal" placeholder="mm" style="width:72px" value="' + (les.maxLength || '') + '" oninput="updateLesionField(' + idx + ',\'maxLength\',this.value)">' +
+            '<span style="font-size:13px;color:var(--label3);">mm</span>' +
+          '</div>' +
+        '</td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td class="lesion-label-cell">Extraprostatic extension</td>' +
+        '<td class="lesion-data-cell"><div class="radio-group">' + epeOptions + '</div></td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td class="lesion-label-cell">Comment</td>' +
+        '<td class="lesion-data-cell">' +
+          '<textarea rows="2" style="width:100%" placeholder="Optional" oninput="updateLesionField(' + idx + ',\'comment\',this.value)">' + (les.comment || '') + '</textarea>' +
+        '</td>' +
+      '</tr>' +
+    '</tbody></table>' +
+  '</div>';
+}
+
+function renderLesions() {
+  const container = document.getElementById('lesion-container');
+  if (state.lesions.length === 0) {
+    container.innerHTML = '<div class="no-lesions-msg">No lesions added. Click "+ Add Lesion" to begin.</div>';
+    return;
+  }
+  container.innerHTML = state.lesions.map((_, i) => renderLesionCard(i)).join('');
+}
+
+// =====================================================================
+// LESION MANAGEMENT
+// =====================================================================
+function addLesion() {
+  state.lesions.push(defaultLesion());
+  saveState();
+  renderLesions();
+  const cards = document.querySelectorAll('.lesion-item');
+  if (cards.length > 0) cards[cards.length-1].scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function deleteLesion(idx) {
+  state.lesions.splice(idx, 1);
+  saveState();
+  renderLesions();
+}
+
+function updateLesionField(idx, field, value) {
+  if (!state.lesions[idx]) return;
+  state.lesions[idx][field] = value;
+  saveState();
+  // Refresh all lesion headers (index may have changed)
+  state.lesions.forEach((_, i) => refreshLesionHeader(i));
+}
+
+function refreshLesionHeader(idx) {
+  const el = document.getElementById('lesion-hdr-left-' + idx);
+  if (!el) return;
+  const les = state.lesions[idx];
+  const indexIdx = getIndexLesionIdx();
+  const isIndex = (indexIdx === idx);
+  const badgeClass = piradsBadgeClass(les.pirads);
+  el.innerHTML =
+    '<span class="lesion-title">Abnormality No.' + (idx+1) + '</span>' +
+    (les.pirads ? '<span class="pirads-badge ' + badgeClass + '">PI-RADS ' + les.pirads + '</span>' : '') +
+    (isIndex ? '<span class="index-badge">Index</span>' : '');
+}
+
+function toggleSector(lidx, key) {
+  const les = state.lesions[lidx];
+  if (!les) return;
+  const pos = les.sectors.indexOf(key);
+  if (pos === -1) les.sectors.push(key);
+  else les.sectors.splice(pos, 1);
+  // Toggle CSS class on all matching cells (only one per lesion card)
+  const isNowSelected = les.sectors.includes(key);
+  document.querySelectorAll('[data-lidx="' + lidx + '"][data-key="' + key + '"]').forEach(c => {
+    // Determine zone from current classes
+    c.classList.toggle('selected', isNowSelected);
+  });
+  // Update chips display
+  const chipsEl = document.getElementById('chips-' + lidx);
+  if (chipsEl) chipsEl.innerHTML = renderChipsHtml(les.sectors);
+  saveState();
+}
+
+// =====================================================================
+// VALIDATION
+// =====================================================================
+function validateBeforeReport() {
+  const errors = [];
+  state.lesions.forEach((les, i) => {
+    const hasAnyInput = les.pirads !== '' || les.sectors.length > 0 || les.maxLength !== '';
+    if (hasAnyInput) {
+      if (les.sectors.length === 0)
+        errors.push('Abnormality No.' + (i+1) + ': location required (select at least one sector on the map)');
+      if (les.pirads === '')
+        errors.push('Abnormality No.' + (i+1) + ': PI-RADS score required');
+      if (les.maxLength === '')
+        errors.push('Abnormality No.' + (i+1) + ': maximal tumor length not entered');
+    }
+  });
+  return errors;
+}
+
+// =====================================================================
+// REPORT GENERATION
+// =====================================================================
+function generateReport() {
+  const errors = validateBeforeReport();
+  if (errors.length > 0) {
+    document.getElementById('errorContent').innerHTML = errors.map(e => '• ' + e).join('<br><br>');
+    document.getElementById('errorDialog').classList.add('show');
+    return;
+  }
+
+  const vol = calcVolume();
+  const psad = calcPSAD();
+  const validLesions = state.lesions.filter(les => les.pirads !== '' || les.sectors.length > 0);
+
+  let r = '';
+  r += '== Finding\n\n';
+
+  r += '<Clinical Information>\n';
+  r += 'Previous biopsy history: ' + (state.prevBiopsy || '') + '\n';
+  r += 'Prostate cancer: ' + (state.prostateCancer || '') + '\n';
+  r += ' Biopsy results\n';
+  r += '  - Positive core(s): ' + (state.positiveCore || '') + '\n';
+  r += '  - Gleason score: ' + (state.gleasonScore || '') + '\n';
+  r += ' Active surveillance: ' + (state.activeSurveillance || '') + '\n';
+  r += '\n';
+
+  r += '<Techniques>\n';
+  r += (state.techniques || '') + '\n';
+  r += 'IV contrast media administration: ' + (state.ivContrast || '') + '\n';
+  r += '\n';
+
+  r += '<Measurements>\n';
+  r += 'PSA (ng/mL): ' + (state.psa || '') + '\n';
+  if (vol !== null) {
+    r += 'Estimated prostate volume (cc): ' + vol.toFixed(1) + ' (' + state.dimL + ' × ' + state.dimW + ' × ' + state.dimH + ' mm)\n';
+  } else {
+    r += 'Estimated prostate volume (cc): \n';
+  }
+  r += 'PSAD (ng/mL/cc): ' + (psad !== null ? psad.toFixed(2) : '') + '\n';
+  r += 'Membranous urethral length (mm): ' + (state.mul || '') + '\n';
+  r += '\n';
+
+  r += '<PIRADS>\n';
+  r += 'Number of suspicious lesions: ' + validLesions.length + '\n';
+
+  if (validLesions.length > 0) {
+    validLesions.forEach((les, i) => {
+      const sorted = sortSectors(les.sectors);
+      const locStr = sorted.map(k => sectorLabel(k)).join(', ');
+      r += '\n Abnormality No.' + (i+1) + ': located at ' + locStr + '\n';
+      r += ' PIRADS score: ' + (les.pirads || '') + '\n';
+      r += ' Maximal tumor length (mm): ' + (les.maxLength || '') + '\n';
+      r += ' Extraprostatic extension: ' + (les.epe || 'none') + '\n';
+      if (les.comment) r += ' Comment: ' + les.comment + '\n';
+    });
+  }
+  r += '\n';
+
+  r += '<Other findings>\n';
+  r += 'Seminal vesicle invasion: ' + (state.svi || 'none') + '\n';
+  r += 'Abnormality of the urinary bladder: ' + (state.bladder || 'none') + '\n';
+  r += 'Invasion to adjacent organ: ' + (state.adjacentOrgan || 'none') + '\n';
+  r += 'Significant lymph node enlargement: ' + (state.lymphNode || 'none') + '\n';
+  r += 'Bone metastases: ' + (state.bone || 'none') + '\n';
+  r += 'Miscellaneous: ' + (state.misc || 'none') + '\n';
+  r += '\n\n';
+
+  r += '== Conclusion\n\n';
+  if (validLesions.length === 0) {
+    r += 'No suspicious intraprostatic lesion.\n';
+  } else {
+    const idxIdx = getIndexLesionIdx();
+    const idxLes = state.lesions[idxIdx];
+    const sorted = sortSectors(idxLes.sectors);
+    const locStr = sorted.map(k => sectorLabel(k)).join(', ');
+    const epeMap = {none:'no', possible:'possible', definite:'definite'};
+    const epeStr = epeMap[idxLes.epe] || 'no';
+    r += 'Index lesion of PIRADS score ' + idxLes.pirads + ' at ' + locStr + ' with ' + epeStr + ' extra-prostatic extension.\n';
+  }
+
+  document.getElementById('reportContent').textContent = r;
+  document.getElementById('reportDialog').classList.add('show');
+}
+
+function copyReport() {
+  const text = document.getElementById('reportContent').textContent;
+  const fb = document.getElementById('copyFeedback');
+  const done = () => { fb.textContent = '✓ Copied to clipboard'; setTimeout(() => { fb.textContent = ''; }, 2500); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); done(); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+// =====================================================================
+// RESET
+// =====================================================================
+function resetProstate() {
+  const ds = JSON.parse(JSON.stringify(defaultState));
+  ['prevBiopsy','prostateCancer','positiveCore','gleasonScore','activeSurveillance',
+   'techniques','ivContrast','dimL','dimW','dimH','psa','mul','lesions'].forEach(k => { state[k] = ds[k]; });
+  saveState(); renderAll();
+}
+
+function resetOther() {
+  const ds = JSON.parse(JSON.stringify(defaultState));
+  ['svi','bladder','adjacentOrgan','lymphNode','bone','misc'].forEach(k => { state[k] = ds[k]; });
+  saveState(); renderAll();
+}
+
+function confirmResetAll() { document.getElementById('confirmDialog').classList.add('show'); }
+
+function doResetAll() {
+  state = JSON.parse(JSON.stringify(defaultState));
+  saveState(); renderAll(); closeDialog('confirmDialog');
+}
+
+// =====================================================================
+// DIALOGS
+// =====================================================================
+function closeDialog(id) { document.getElementById(id).classList.remove('show'); }
+
+// =====================================================================
+// THEME
+// =====================================================================
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  localStorage.setItem('prostateTool_theme', isLight ? 'light' : 'dark');
+  updateThemeIcon(isLight);
+}
+function updateThemeIcon(isLight) {
+  document.getElementById('themeToggleBtn').innerHTML = isLight
+    ? '<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></svg>'
+    : '<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><path d="M12 2v2.5M12 19.5V22M4.22 4.22l1.77 1.77M18.01 18.01l1.77 1.77M2 12h2.5M19.5 12H22M4.22 19.78l1.77-1.77M18.01 5.99l1.77-1.77" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+}
+
+// =====================================================================
+// TAB SWITCHING
+// =====================================================================
+function switchTab(tab) {
+  state.activeTab = tab;
+  saveState();
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('tab-content-' + tab).classList.add('active');
+}
+
+// =====================================================================
+// RENDER ALL (restore UI from state)
+// =====================================================================
+function renderAll() {
+  // Tab
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  const activeTab = state.activeTab || 'prostate';
+  const tabBtn = document.getElementById('tab-' + activeTab);
+  if (tabBtn) tabBtn.classList.add('active');
+  const tabContent = document.getElementById('tab-content-' + activeTab);
+  if (tabContent) tabContent.classList.add('active');
+
+  // Clinical info radios
+  document.querySelectorAll('input[name="prevBiopsy"]').forEach(r => { r.checked = (r.value === state.prevBiopsy); });
+  document.querySelectorAll('input[name="prostateCancer"]').forEach(r => { r.checked = (r.value === state.prostateCancer); });
+  document.getElementById('positiveCore').value = state.positiveCore || '';
+  document.getElementById('gleasonScore').value = state.gleasonScore || '';
+  document.getElementById('activeSurveillance').value = state.activeSurveillance || '';
+
+  // Techniques
+  document.getElementById('techniques').value = state.techniques || DEFAULT_TECHNIQUES;
+  document.querySelectorAll('input[name="ivContrast"]').forEach(r => { r.checked = (r.value === state.ivContrast); });
+
+  // Measurements
+  document.getElementById('dim-L').value = state.dimL || '';
+  document.getElementById('dim-W').value = state.dimW || '';
+  document.getElementById('dim-H').value = state.dimH || '';
+  document.getElementById('psa').value = state.psa || '';
+  document.getElementById('mul').value = state.mul || '';
+  updateCalcDisplay();
+
+  // Lesions
+  renderLesions();
+
+  // Other findings
+  document.getElementById('svi').value = state.svi || 'none';
+  document.getElementById('bladder').value = state.bladder || 'none';
+  document.getElementById('adjacentOrgan').value = state.adjacentOrgan || 'none';
+  document.getElementById('lymphNode').value = state.lymphNode || 'none';
+  document.getElementById('bone').value = state.bone || 'none';
+  document.getElementById('misc').value = state.misc || 'none';
+}
+
+// =====================================================================
+// INIT
+// =====================================================================
+document.addEventListener('DOMContentLoaded', function() {
+  const theme = localStorage.getItem('prostateTool_theme') || 'dark';
+  if (theme === 'light') document.body.classList.add('light');
+  updateThemeIcon(theme === 'light');
+  loadState();
+  renderAll();
+});
+</script>
+</body>
+</html>
