@@ -260,7 +260,7 @@ textarea:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45); }
 .sector-panels {
   display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;
 }
-.sector-panel { flex:0 0 calc(33% - 4px);min-width:110px; }
+.sector-panel { flex:0 0 calc(33% - 4px);min-width:130px; }
 .sector-panel-title {
   text-align:center;font-weight:700;font-size:11px;
   color:var(--label2);padding:4px 0 2px;letter-spacing:.3px;text-transform:uppercase;
@@ -269,28 +269,25 @@ textarea:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45); }
   display:flex;justify-content:space-between;padding:0 2px 2px;
   font-size:9px;color:var(--label3);font-weight:700;letter-spacing:.5px;
 }
-.sector-grid {
-  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;
-}
-/* sector cells */
-.sc {
-  min-height:28px;display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:600;border-radius:4px;cursor:pointer;
-  user-select:none;transition:opacity .15s;text-align:center;
-  padding:2px 1px;-webkit-tap-highlight-color:transparent;
-  letter-spacing:-.2px;
-}
-.sc:active:not(.empty) { opacity:.65; }
-.sc.span2 { grid-column:span 2; }
-.sc.pz { background:var(--blue-bg);color:var(--blue); }
-.sc.tz { background:var(--green-bg);color:var(--green); }
-.sc.cz { background:var(--purple-bg);color:var(--purple); }
-.sc.afs { background:var(--fill3);color:var(--label3); }
-.sc.empty { background:transparent;cursor:default;pointer-events:none; }
-.sc.selected.pz { background:var(--blue);color:#fff; }
-.sc.selected.tz { background:var(--green);color:#fff; }
-.sc.selected.cz { background:var(--purple);color:#fff; }
-.sc.selected.afs { background:var(--gray);color:#fff; }
+/* SVG sector cells */
+.sc-svg { cursor:pointer;-webkit-tap-highlight-color:transparent; }
+.sc-svg rect { transition:fill .15s; }
+.sc-svg:active rect { opacity:.72; }
+.sc-svg text { font-size:9px;font-weight:700;pointer-events:none;user-select:none;
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Arial,sans-serif; }
+.sc-svg.pz  rect { fill:var(--blue-bg); }
+.sc-svg.tz  rect { fill:var(--green-bg); }
+.sc-svg.cz  rect { fill:var(--purple-bg); }
+.sc-svg.afs rect { fill:var(--fill3); }
+.sc-svg.pz  text { fill:var(--blue); }
+.sc-svg.tz  text { fill:var(--green); }
+.sc-svg.cz  text { fill:var(--purple); }
+.sc-svg.afs text { fill:var(--label3); }
+.sc-svg.selected.pz  rect { fill:var(--blue); }
+.sc-svg.selected.tz  rect { fill:var(--green); }
+.sc-svg.selected.cz  rect { fill:var(--purple); }
+.sc-svg.selected.afs rect { fill:var(--gray); }
+.sc-svg.selected text { fill:#fff; }
 /* orientation hint */
 .sector-orient {
   display:flex;justify-content:space-between;padding:2px 2px 0;
@@ -383,7 +380,6 @@ textarea:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45); }
   .dialog-box { padding:8px 16px 44px;max-height:93vh; }
   .dialog-body { font-size:12px;padding:12px; }
   .dialog-actions { flex-wrap:wrap; }
-  .sc { min-height:26px;font-size:9px; }
 }
 @media (max-width:390px) {
   .tab-btn { font-size:10px; }
@@ -819,58 +815,81 @@ function getIndexLesionIdx() {
 }
 
 // =====================================================================
-// SECTOR MAP RENDERING (HTML string, one panel at a time)
+// SECTOR MAP RENDERING — SVG axial diagram
+// viewBox 0 0 200 200 · prostate ellipse cx=100,cy=100,rx=92,ry=82
+// Anterior=top, Posterior=bottom, Patient R=screen left
 // =====================================================================
-function zoneOf(region) {
-  if (region === 'CZ') return 'cz';
-  if (region === 'AFS') return 'afs';
-  if (region.startsWith('TZ')) return 'tz';
-  return 'pz';
-}
-
-function makeCell(key, label, zone, span, lidx, selectedArr) {
-  if (!key) return '<div class="sc empty' + (span === 2 ? ' span2' : '') + '"></div>';
-  const selClass = selectedArr.includes(key) ? ' selected' : '';
-  const spanClass = span === 2 ? ' span2' : '';
-  return '<div class="sc ' + zone + spanClass + selClass + '" data-key="' + key + '" data-lidx="' + lidx + '" onclick="toggleSector(' + lidx + ',\'' + key + '\')">' + label + '</div>';
-}
-
 function renderSectorPanel(level, lidx) {
   const sel = (state.lesions[lidx] || {sectors:[]}).sectors;
   const cap = level.charAt(0).toUpperCase() + level.slice(1);
   const hasCZ = (level === 'base');
+  const clipId = 'svgclip-' + level + '-' + lidx;
 
-  let g = '';
-  // Row 1: AFS (span 2 each)
-  g += makeCell(sectorKey(level,'AFS','R'), 'AFS', 'afs', 2, lidx, sel);
-  g += makeCell(sectorKey(level,'AFS','L'), 'AFS', 'afs', 2, lidx, sel);
-  // Row 2: PZa, TZa, TZa, PZa
-  g += makeCell(sectorKey(level,'PZa','R'), 'PZa', 'pz', 1, lidx, sel);
-  g += makeCell(sectorKey(level,'TZa','R'), 'TZa', 'tz', 1, lidx, sel);
-  g += makeCell(sectorKey(level,'TZa','L'), 'TZa', 'tz', 1, lidx, sel);
-  g += makeCell(sectorKey(level,'PZa','L'), 'PZa', 'pz', 1, lidx, sel);
-  // Row 3: PZpl, TZp, TZp, PZpl
-  g += makeCell(sectorKey(level,'PZpl','R'), 'PZpl', 'pz', 1, lidx, sel);
-  g += makeCell(sectorKey(level,'TZp','R'), 'TZp', 'tz', 1, lidx, sel);
-  g += makeCell(sectorKey(level,'TZp','L'), 'TZp', 'tz', 1, lidx, sel);
-  g += makeCell(sectorKey(level,'PZpl','L'), 'PZpl', 'pz', 1, lidx, sel);
-  // Row 4 (base only): empty, CZ, CZ, empty
-  if (hasCZ) {
-    g += makeCell(null, '', '', 1, lidx, sel);
-    g += makeCell(sectorKey(level,'CZ','R'), 'CZ', 'cz', 1, lidx, sel);
-    g += makeCell(sectorKey(level,'CZ','L'), 'CZ', 'cz', 1, lidx, sel);
-    g += makeCell(null, '', '', 1, lidx, sel);
+  const TZL=58, CTR=100, TZR=142;
+  const AFS_B=51, PZA_B=97, TZP_B=143;
+
+  function z(key, cls, x, y, w, h, tx, ty, lbl, fs) {
+    const sc = sel.includes(key) ? ' selected' : '';
+    return '<g class="sc-svg ' + cls + sc + '" data-key="' + key + '" data-lidx="' + lidx + '" onclick="toggleSector(' + lidx + ',\'' + key + '\')">' +
+      '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"/>' +
+      '<text x="' + tx + '" y="' + ty + '" text-anchor="middle" dominant-baseline="middle"' + (fs ? ' font-size="' + fs + '"' : '') + '>' + lbl + '</text>' +
+      '</g>';
   }
-  // Row 5: PZpm (span 2 each)
-  g += makeCell(sectorKey(level,'PZpm','R'), 'PZpm', 'pz', 2, lidx, sel);
-  g += makeCell(sectorKey(level,'PZpm','L'), 'PZpm', 'pz', 2, lidx, sel);
+
+  // Base: PZpm = lateral-only strips (x=0-58 and x=142-200), no overlap with CZ
+  // Mid/Apex: PZpm = full left/right halves
+  const pzmR_w = hasCZ ? TZL     : CTR;
+  const pzmL_x = hasCZ ? TZR     : CTR;
+  const pzmL_w = hasCZ ? 200-TZR : CTR;
+  // Text: moved inward so it lands within the visible ellipse area
+  const pzmRtx = hasCZ ? 42  : 70;   // base: center of narrow left strip; mid/apex: inside ellipse
+  const pzmLtx = hasCZ ? 158 : 130;
+  const pzmTy  = 150;
+  const pzmFs  = hasCZ ? '7' : null; // smaller font for narrow base strips
+
+  const zones =
+    z(sectorKey(level,'AFS','R'),'afs', 0,     0,      CTR,     AFS_B,       CTR/2,       AFS_B/2,         'AFS'  ) +
+    z(sectorKey(level,'AFS','L'),'afs', CTR,   0,      CTR,     AFS_B,       CTR+CTR/2,   AFS_B/2,         'AFS'  ) +
+    z(sectorKey(level,'PZa','R'), 'pz', 0,     AFS_B,  TZL,     PZA_B-AFS_B, TZL/2,       (AFS_B+PZA_B)/2, 'PZa'  ) +
+    z(sectorKey(level,'TZa','R'), 'tz', TZL,   AFS_B,  CTR-TZL, PZA_B-AFS_B, (TZL+CTR)/2, (AFS_B+PZA_B)/2, 'TZa'  ) +
+    z(sectorKey(level,'TZa','L'), 'tz', CTR,   AFS_B,  TZR-CTR, PZA_B-AFS_B, (CTR+TZR)/2, (AFS_B+PZA_B)/2, 'TZa'  ) +
+    z(sectorKey(level,'PZa','L'), 'pz', TZR,   AFS_B,  200-TZR, PZA_B-AFS_B, (TZR+200)/2, (AFS_B+PZA_B)/2, 'PZa'  ) +
+    z(sectorKey(level,'PZpl','R'),'pz', 0,     PZA_B,  TZL,     TZP_B-PZA_B, TZL/2,       (PZA_B+TZP_B)/2, 'PZpl' ) +
+    z(sectorKey(level,'TZp','R'), 'tz', TZL,   PZA_B,  CTR-TZL, TZP_B-PZA_B, (TZL+CTR)/2, (PZA_B+TZP_B)/2, 'TZp'  ) +
+    z(sectorKey(level,'TZp','L'), 'tz', CTR,   PZA_B,  TZR-CTR, TZP_B-PZA_B, (CTR+TZR)/2, (PZA_B+TZP_B)/2, 'TZp'  ) +
+    z(sectorKey(level,'PZpl','L'),'pz', TZR,   PZA_B,  200-TZR, TZP_B-PZA_B, (TZR+200)/2, (PZA_B+TZP_B)/2, 'PZpl' ) +
+    z(sectorKey(level,'PZpm','R'),'pz', 0,     TZP_B,  pzmR_w,  200-TZP_B,   pzmRtx,      pzmTy,           'PZpm', pzmFs) +
+    z(sectorKey(level,'PZpm','L'),'pz', pzmL_x, TZP_B, pzmL_w,  200-TZP_B,   pzmLtx,      pzmTy,           'PZpm', pzmFs) +
+    (hasCZ
+      ? z(sectorKey(level,'CZ','R'),'cz', TZL, TZP_B, CTR-TZL, 200-TZP_B, (TZL+CTR)/2, 162, 'CZ') +
+        z(sectorKey(level,'CZ','L'),'cz', CTR, TZP_B, TZR-CTR, 200-TZP_B, (CTR+TZR)/2, 162, 'CZ')
+      : '');
+
+  const sep = 'var(--sep-opaque)';
+  // TZL/TZR vertical lines extend to prostate bottom for base (separates PZpm from CZ),
+  // only to TZP_B for mid/apex (no zone division needed below PZpm row)
+  const vBottom = hasCZ ? 200 : TZP_B;
+  const dividers = '<g pointer-events="none" stroke="' + sep + '" stroke-width="1" fill="none">' +
+    '<line x1="0" y1="' + AFS_B + '" x2="200" y2="' + AFS_B + '"/>' +
+    '<line x1="0" y1="' + PZA_B + '" x2="200" y2="' + PZA_B + '"/>' +
+    '<line x1="0" y1="' + TZP_B + '" x2="200" y2="' + TZP_B + '"/>' +
+    '<line x1="' + TZL + '" y1="' + AFS_B + '" x2="' + TZL + '" y2="' + vBottom + '"/>' +
+    '<line x1="' + TZR + '" y1="' + AFS_B + '" x2="' + TZR + '" y2="' + vBottom + '"/>' +
+    '<line x1="' + CTR + '" y1="0" x2="' + CTR + '" y2="200" stroke-width="1.5"/>' +
+    '</g>';
+
+  const svg =
+    '<svg viewBox="0 0 200 200" style="display:block;width:100%;" xmlns="http://www.w3.org/2000/svg">' +
+    '<defs><clipPath id="' + clipId + '"><ellipse cx="100" cy="100" rx="92" ry="82"/></clipPath></defs>' +
+    '<g clip-path="url(#' + clipId + ')">' + zones + dividers + '</g>' +
+    '<ellipse cx="100" cy="100" rx="92" ry="82" fill="none" stroke="' + sep + '" stroke-width="2"/>' +
+    '</svg>';
 
   return '<div class="sector-panel">' +
     '<div class="sector-panel-title">' + cap + '</div>' +
     '<div class="sector-rl-label"><span>← R</span><span>L →</span></div>' +
     '<div class="sector-orient"><span style="font-size:9px;color:var(--label3)">Ant↑</span><span style="font-size:9px;color:var(--label3)">Post↓</span></div>' +
-    '<div class="sector-grid">' + g + '</div>' +
-    '</div>';
+    svg + '</div>';
 }
 
 // =====================================================================
