@@ -100,8 +100,6 @@ body.light #top-bar { background:rgba(255,255,255,.85); border-bottom-color:rgba
 
 /* ===== MAIN ===== */
 #main { margin-top:52px;padding:16px; }
-.tab-content { display:none; }
-.tab-content.active { display:block; }
 
 /* ===== ACTION BAR ===== */
 .action-bar { display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-top:2px; }
@@ -370,7 +368,7 @@ textarea:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45); }
 @media (max-width:680px) {
   #top-bar { height:auto;padding:0 10px 8px;flex-wrap:wrap;gap:0; }
   .tab-btn { flex:1;height:44px;padding:0 6px;font-size:12px;border-bottom-width:2px;min-width:0; }
-  .top-spacer { flex-basis:100%;height:0;flex-shrink:0; }
+
   .report-btn { flex:1;margin:6px 6px 0 0;padding:10px;font-size:14px; }
   .reset-all-btn { flex-shrink:0;margin:6px 0 0;padding:10px 14px;font-size:14px; }
   .theme-toggle-btn { margin:6px 0 0; }
@@ -396,8 +394,6 @@ textarea:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45); }
 
 <!-- TOP BAR -->
 <div id="top-bar">
-  <button class="tab-btn active" onclick="switchTab('prostate')" id="tab-prostate">Prostate</button>
-  <button class="tab-btn" onclick="switchTab('other')" id="tab-other">Other findings</button>
   <div class="top-spacer"></div>
   <button class="report-btn" onclick="generateReport()">판독문</button>
   <button class="reset-all-btn" onclick="confirmResetAll()">전체 초기화</button>
@@ -409,11 +405,9 @@ textarea:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45); }
 <!-- MAIN CONTENT -->
 <div id="main">
 
-  <!-- ======== TAB 1: PROSTATE ======== -->
-  <div class="tab-content active" id="tab-content-prostate">
-    <div class="action-bar">
-      <button class="pink-btn" onclick="resetProstate()">Prostate 초기화</button>
-    </div>
+  <div class="action-bar">
+    <button class="pink-btn" onclick="resetProstate()">Prostate 초기화</button>
+  </div>
 
     <!-- Clinical Information -->
     <div class="table-card"><table class="data-table">
@@ -423,8 +417,8 @@ textarea:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45); }
           <td class="label-cell">Previous biopsy history</td>
           <td>
             <div class="radio-group">
-              <label><input type="radio" name="prevBiopsy" value="yes" onchange="state.prevBiopsy=this.value;saveState()"> yes</label>
-              <label><input type="radio" name="prevBiopsy" value="no" onchange="state.prevBiopsy=this.value;saveState()"> no</label>
+              <label><input type="radio" name="prevBiopsy" value="yes" onchange="onPrevBiopsyChange(this.value)"> yes</label>
+              <label><input type="radio" name="prevBiopsy" value="no" onchange="onPrevBiopsyChange(this.value)"> no</label>
             </div>
           </td>
         </tr>
@@ -455,7 +449,10 @@ textarea:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45); }
         <tr>
           <td class="label-cell">Active surveillance</td>
           <td>
-            <input type="text" id="activeSurveillance" placeholder="" style="width:220px" oninput="state.activeSurveillance=this.value;saveState()">
+            <div class="radio-group">
+              <label><input type="radio" name="activeSurveillance" value="no" onchange="state.activeSurveillance=this.value;saveState()"> no</label>
+              <label><input type="radio" name="activeSurveillance" value="yes" onchange="state.activeSurveillance=this.value;saveState()"> yes</label>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -475,8 +472,8 @@ textarea:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45); }
           <td class="label-cell">IV contrast media administration</td>
           <td>
             <div class="radio-group">
-              <label><input type="radio" name="ivContrast" value="yes" onchange="state.ivContrast=this.value;saveState()"> yes</label>
-              <label><input type="radio" name="ivContrast" value="no" onchange="state.ivContrast=this.value;saveState()"> no</label>
+              <label><input type="radio" name="ivContrast" value="yes" onchange="onIvContrastChange(this.value)"> yes</label>
+              <label><input type="radio" name="ivContrast" value="no" onchange="onIvContrastChange(this.value)"> no</label>
             </div>
           </td>
         </tr>
@@ -542,49 +539,84 @@ textarea:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45); }
     <div id="lesion-container"></div>
     <button class="add-lesion-btn" onclick="addLesion()">+ Add Lesion</button>
 
-  </div><!-- end tab-content-prostate -->
-
-  <!-- ======== TAB 2: OTHER FINDINGS ======== -->
-  <div class="tab-content" id="tab-content-other">
-    <div class="action-bar">
-      <button class="pink-btn" onclick="resetOther()">Other findings 초기화</button>
-    </div>
+  <!-- OTHER FINDINGS -->
+  <div class="section-title-bar" style="margin-top:8px;">
+    <span class="section-title-text">Other findings</span>
+  </div>
+  <div class="action-bar">
+    <button class="pink-btn" onclick="resetOther()">Other findings 초기화</button>
+  </div>
     <div class="table-card"><table class="data-table">
       <thead><tr><th colspan="2">Other findings</th></tr></thead>
       <tbody>
         <tr>
           <td class="label-cell">Seminal vesicle invasion</td>
-          <td><textarea id="svi" rows="2" style="width:100%" oninput="state.svi=this.value;saveState()"></textarea></td>
+          <td>
+            <div class="radio-group" style="margin-bottom:6px;">
+              <label><input type="radio" name="sviToggle" value="no" onchange="onOtherToggle('svi',this.value)"> no</label>
+              <label><input type="radio" name="sviToggle" value="yes" onchange="onOtherToggle('svi',this.value)"> yes</label>
+            </div>
+            <textarea id="sviText" rows="2" style="width:100%;display:none" placeholder="Details..." oninput="state.sviText=this.value;saveState()"></textarea>
+          </td>
         </tr>
         <tr>
           <td class="label-cell">Abnormality of the urinary bladder</td>
-          <td><textarea id="bladder" rows="2" style="width:100%" oninput="state.bladder=this.value;saveState()"></textarea></td>
+          <td>
+            <div class="radio-group" style="margin-bottom:6px;">
+              <label><input type="radio" name="bladderToggle" value="no" onchange="onOtherToggle('bladder',this.value)"> no</label>
+              <label><input type="radio" name="bladderToggle" value="yes" onchange="onOtherToggle('bladder',this.value)"> yes</label>
+            </div>
+            <textarea id="bladderText" rows="2" style="width:100%;display:none" placeholder="Details..." oninput="state.bladderText=this.value;saveState()"></textarea>
+          </td>
         </tr>
         <tr>
           <td class="label-cell">Invasion to adjacent organ</td>
-          <td><textarea id="adjacentOrgan" rows="2" style="width:100%" oninput="state.adjacentOrgan=this.value;saveState()"></textarea></td>
+          <td>
+            <div class="radio-group" style="margin-bottom:6px;">
+              <label><input type="radio" name="adjacentOrganToggle" value="no" onchange="onOtherToggle('adjacentOrgan',this.value)"> no</label>
+              <label><input type="radio" name="adjacentOrganToggle" value="yes" onchange="onOtherToggle('adjacentOrgan',this.value)"> yes</label>
+            </div>
+            <textarea id="adjacentOrganText" rows="2" style="width:100%;display:none" placeholder="Details..." oninput="state.adjacentOrganText=this.value;saveState()"></textarea>
+          </td>
         </tr>
         <tr>
           <td class="label-cell">Significant lymph node enlargement</td>
-          <td><textarea id="lymphNode" rows="2" style="width:100%" oninput="state.lymphNode=this.value;saveState()"></textarea></td>
+          <td>
+            <div class="radio-group" style="margin-bottom:6px;">
+              <label><input type="radio" name="lymphNodeToggle" value="no" onchange="onOtherToggle('lymphNode',this.value)"> no</label>
+              <label><input type="radio" name="lymphNodeToggle" value="yes" onchange="onOtherToggle('lymphNode',this.value)"> yes</label>
+            </div>
+            <textarea id="lymphNodeText" rows="2" style="width:100%;display:none" placeholder="Details..." oninput="state.lymphNodeText=this.value;saveState()"></textarea>
+          </td>
         </tr>
         <tr>
           <td class="label-cell">Bone metastases</td>
-          <td><textarea id="bone" rows="2" style="width:100%" oninput="state.bone=this.value;saveState()"></textarea></td>
+          <td>
+            <div class="radio-group" style="margin-bottom:6px;">
+              <label><input type="radio" name="boneToggle" value="no" onchange="onOtherToggle('bone',this.value)"> no</label>
+              <label><input type="radio" name="boneToggle" value="yes" onchange="onOtherToggle('bone',this.value)"> yes</label>
+            </div>
+            <textarea id="boneText" rows="2" style="width:100%;display:none" placeholder="Details..." oninput="state.boneText=this.value;saveState()"></textarea>
+          </td>
         </tr>
         <tr>
           <td class="label-cell">Miscellaneous</td>
-          <td><textarea id="misc" rows="2" style="width:100%" oninput="state.misc=this.value;saveState()"></textarea></td>
+          <td>
+            <div class="radio-group" style="margin-bottom:6px;">
+              <label><input type="radio" name="miscToggle" value="no" onchange="onOtherToggle('misc',this.value)"> no</label>
+              <label><input type="radio" name="miscToggle" value="yes" onchange="onOtherToggle('misc',this.value)"> yes</label>
+            </div>
+            <textarea id="miscText" rows="2" style="width:100%;display:none" placeholder="Details..." oninput="state.miscText=this.value;saveState()"></textarea>
+          </td>
         </tr>
       </tbody>
     </table></div>
-  </div><!-- end tab-content-other -->
 
 </div><!-- end main -->
 
 <!-- FOOTER -->
 <footer id="app-footer">
-  <div class="footer-name">Hunjong Lim, MD</div>
+  <div class="footer-name">Sungil Hwang, MD</div>
   <div class="footer-sub">Prostate MRI Structured Report · PI-RADS v2.1</div>
   <div class="footer-sub" style="margin-top:4px;">© 2025 All rights reserved</div>
 </footer>
@@ -596,7 +628,8 @@ textarea:focus { outline:none;box-shadow:0 0 0 3px rgba(10,132,255,.45); }
     <div class="dialog-body" id="reportContent"></div>
     <div class="dialog-actions">
       <span class="copy-feedback" id="copyFeedback"></span>
-      <button class="blue-btn" onclick="copyReport()">Copy to Clipboard</button>
+      <button class="blue-btn" onclick="copyFindings()">Copy Findings to Clipboard</button>
+      <button class="blue-btn" onclick="copyConclusion()">Copy Conclusion to Clipboard</button>
       <button class="pink-btn" onclick="closeDialog('reportDialog')">Close</button>
     </div>
   </div>
@@ -670,26 +703,26 @@ function sortSectors(sectors) {
 // STATE
 // =====================================================================
 const DEFAULT_TECHNIQUES = 'Axial DWI, axial T1WI, T2WI (axial, sagittal, coronal), axial DCE MRI, axial contrast-enhanced T1WI';
+const DEFAULT_TECHNIQUES_NO_CONTRAST = 'Axial DWI, axial T1WI, T2WI (axial, sagittal, coronal)';
 
 const defaultState = {
-  activeTab: 'prostate',
-  prevBiopsy: '',
-  prostateCancer: '',
+  prevBiopsy: 'no',
+  prostateCancer: 'not confirmed',
   positiveCore: '',
   gleasonScore: '',
-  activeSurveillance: '',
+  activeSurveillance: 'no',
   techniques: DEFAULT_TECHNIQUES,
   ivContrast: 'yes',
   dimL: '', dimW: '', dimH: '',
   psa: '',
   mul: '',
   lesions: [],
-  svi: 'none',
-  bladder: 'none',
-  adjacentOrgan: 'none',
-  lymphNode: 'none',
-  bone: 'none',
-  misc: 'none'
+  svi: 'no', sviText: '',
+  bladder: 'no', bladderText: '',
+  adjacentOrgan: 'no', adjacentOrganText: '',
+  lymphNode: 'no', lymphNodeText: '',
+  bone: 'no', boneText: '',
+  misc: 'no', miscText: ''
 };
 
 function defaultLesion() {
@@ -713,7 +746,13 @@ function deepMerge(target, source) {
 function loadState() {
   try {
     const s = localStorage.getItem('prostateReport_v1');
-    if (s) state = deepMerge(JSON.parse(JSON.stringify(defaultState)), JSON.parse(s));
+    if (s) {
+      state = deepMerge(JSON.parse(JSON.stringify(defaultState)), JSON.parse(s));
+      // migrate old string format for other findings
+      ['svi','bladder','adjacentOrgan','lymphNode','bone','misc'].forEach(f => {
+        if (state[f] === 'none' || (state[f] !== 'no' && state[f] !== 'yes')) state[f] = 'no';
+      });
+    }
   } catch(e) {}
 }
 
@@ -1047,7 +1086,7 @@ function generateReport() {
   r += 'Membranous urethral length (mm): ' + (state.mul || '') + '\n';
   r += '\n';
 
-  r += '<PIRADS>\n';
+  r += '<PI-RADS>\n';
   r += 'Number of suspicious lesions: ' + validLesions.length + '\n';
 
   if (validLesions.length > 0) {
@@ -1055,7 +1094,7 @@ function generateReport() {
       const sorted = sortSectors(les.sectors);
       const locStr = sorted.map(k => sectorLabel(k)).join(', ');
       r += '\n Abnormality No.' + (i+1) + ': located at ' + locStr + '\n';
-      r += ' PIRADS score: ' + (les.pirads || '') + '\n';
+      r += ' PI-RADS score: ' + (les.pirads || '') + '\n';
       r += ' Maximal tumor length (mm): ' + (les.maxLength || '') + '\n';
       r += ' Extraprostatic extension: ' + (les.epe || 'none') + '\n';
       if (les.comment) r += ' Comment: ' + les.comment + '\n';
@@ -1064,12 +1103,12 @@ function generateReport() {
   r += '\n';
 
   r += '<Other findings>\n';
-  r += 'Seminal vesicle invasion: ' + (state.svi || 'none') + '\n';
-  r += 'Abnormality of the urinary bladder: ' + (state.bladder || 'none') + '\n';
-  r += 'Invasion to adjacent organ: ' + (state.adjacentOrgan || 'none') + '\n';
-  r += 'Significant lymph node enlargement: ' + (state.lymphNode || 'none') + '\n';
-  r += 'Bone metastases: ' + (state.bone || 'none') + '\n';
-  r += 'Miscellaneous: ' + (state.misc || 'none') + '\n';
+  r += 'Seminal vesicle invasion: ' + otherVal('svi') + '\n';
+  r += 'Abnormality of the urinary bladder: ' + otherVal('bladder') + '\n';
+  r += 'Invasion to adjacent organ: ' + otherVal('adjacentOrgan') + '\n';
+  r += 'Significant lymph node enlargement: ' + otherVal('lymphNode') + '\n';
+  r += 'Bone metastases: ' + otherVal('bone') + '\n';
+  r += 'Miscellaneous: ' + otherVal('misc') + '\n';
   r += '\n\n';
 
   r += '== Conclusion\n\n';
@@ -1082,22 +1121,34 @@ function generateReport() {
     const locStr = sorted.map(k => sectorLabel(k)).join(', ');
     const epeMap = {none:'no', possible:'possible', definite:'definite'};
     const epeStr = epeMap[idxLes.epe] || 'no';
-    r += 'Index lesion of PIRADS score ' + idxLes.pirads + ' at ' + locStr + ' with ' + epeStr + ' extra-prostatic extension.\n';
+    r += 'Index lesion of PI-RADS score ' + idxLes.pirads + ' at ' + locStr + ' with ' + epeStr + ' extra-prostatic extension.\n';
   }
 
   document.getElementById('reportContent').textContent = r;
   document.getElementById('reportDialog').classList.add('show');
 }
 
-function copyReport() {
-  const text = document.getElementById('reportContent').textContent;
+function copyText(text, msg) {
   const fb = document.getElementById('copyFeedback');
-  const done = () => { fb.textContent = '✓ Copied to clipboard'; setTimeout(() => { fb.textContent = ''; }, 2500); };
+  const done = () => { fb.textContent = '✓ ' + msg; setTimeout(() => { fb.textContent = ''; }, 2500); };
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
   } else {
     fallbackCopy(text, done);
   }
+}
+function copyFindings() {
+  const text = document.getElementById('reportContent').textContent;
+  const conclusionIdx = text.indexOf('== Conclusion');
+  const block = (conclusionIdx !== -1 ? text.substring(0, conclusionIdx) : text);
+  const newlineIdx = block.indexOf('\n');
+  copyText((newlineIdx !== -1 ? block.substring(newlineIdx) : block).trim(), 'Findings copied');
+}
+function copyConclusion() {
+  const text = document.getElementById('reportContent').textContent;
+  const idx = text.indexOf('== Conclusion');
+  if (idx === -1) { copyText('', 'Conclusion copied'); return; }
+  copyText(text.substring(idx + '== Conclusion'.length).trim(), 'Conclusion copied');
 }
 function fallbackCopy(text, done) {
   const ta = document.createElement('textarea');
@@ -1105,6 +1156,56 @@ function fallbackCopy(text, done) {
   document.body.appendChild(ta); ta.select();
   try { document.execCommand('copy'); done(); } catch(e) {}
   document.body.removeChild(ta);
+}
+
+// =====================================================================
+// BIOPSY HISTORY / PROSTATE CANCER LINK
+// =====================================================================
+function applyBiopsyConstraint(prevVal) {
+  const confirmedInput = document.querySelector('input[name="prostateCancer"][value="confirmed"]');
+  if (!confirmedInput) return;
+  const confirmedLabel = confirmedInput.closest('label');
+  if (prevVal === 'no') {
+    confirmedInput.disabled = true;
+    if (confirmedLabel) { confirmedLabel.style.opacity = '0.35'; confirmedLabel.style.pointerEvents = 'none'; }
+  } else {
+    confirmedInput.disabled = false;
+    if (confirmedLabel) { confirmedLabel.style.opacity = ''; confirmedLabel.style.pointerEvents = ''; }
+  }
+}
+
+function onPrevBiopsyChange(val) {
+  state.prevBiopsy = val;
+  if (val === 'no') {
+    state.prostateCancer = 'not confirmed';
+    document.querySelectorAll('input[name="prostateCancer"]').forEach(r => { r.checked = (r.value === 'not confirmed'); });
+  }
+  applyBiopsyConstraint(val);
+  saveState();
+}
+
+// =====================================================================
+// IV CONTRAST / OTHER FINDINGS HANDLERS
+// =====================================================================
+function onIvContrastChange(val) {
+  state.ivContrast = val;
+  state.techniques = (val === 'no') ? DEFAULT_TECHNIQUES_NO_CONTRAST : DEFAULT_TECHNIQUES;
+  document.getElementById('techniques').value = state.techniques;
+  saveState();
+}
+
+function onOtherToggle(field, val) {
+  state[field] = val;
+  const textEl = document.getElementById(field + 'Text');
+  if (textEl) {
+    textEl.style.display = val === 'yes' ? '' : 'none';
+    if (val === 'no') { state[field + 'Text'] = ''; textEl.value = ''; }
+  }
+  saveState();
+}
+
+function otherVal(field) {
+  return state[field] === 'yes' ? (state[field + 'Text'] || 'yes') : 'none';
 }
 
 // =====================================================================
@@ -1119,7 +1220,8 @@ function resetProstate() {
 
 function resetOther() {
   const ds = JSON.parse(JSON.stringify(defaultState));
-  ['svi','bladder','adjacentOrgan','lymphNode','bone','misc'].forEach(k => { state[k] = ds[k]; });
+  ['svi','sviText','bladder','bladderText','adjacentOrgan','adjacentOrganText',
+   'lymphNode','lymphNodeText','bone','boneText','misc','miscText'].forEach(k => { state[k] = ds[k]; });
   saveState(); renderAll();
 }
 
@@ -1150,37 +1252,18 @@ function updateThemeIcon(isLight) {
     : '<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><path d="M12 2v2.5M12 19.5V22M4.22 4.22l1.77 1.77M18.01 18.01l1.77 1.77M2 12h2.5M19.5 12H22M4.22 19.78l1.77-1.77M18.01 5.99l1.77-1.77" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 }
 
-// =====================================================================
-// TAB SWITCHING
-// =====================================================================
-function switchTab(tab) {
-  state.activeTab = tab;
-  saveState();
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  document.getElementById('tab-content-' + tab).classList.add('active');
-}
 
 // =====================================================================
 // RENDER ALL (restore UI from state)
 // =====================================================================
 function renderAll() {
-  // Tab
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  const activeTab = state.activeTab || 'prostate';
-  const tabBtn = document.getElementById('tab-' + activeTab);
-  if (tabBtn) tabBtn.classList.add('active');
-  const tabContent = document.getElementById('tab-content-' + activeTab);
-  if (tabContent) tabContent.classList.add('active');
-
   // Clinical info radios
   document.querySelectorAll('input[name="prevBiopsy"]').forEach(r => { r.checked = (r.value === state.prevBiopsy); });
   document.querySelectorAll('input[name="prostateCancer"]').forEach(r => { r.checked = (r.value === state.prostateCancer); });
+  applyBiopsyConstraint(state.prevBiopsy);
   document.getElementById('positiveCore').value = state.positiveCore || '';
   document.getElementById('gleasonScore').value = state.gleasonScore || '';
-  document.getElementById('activeSurveillance').value = state.activeSurveillance || '';
+  document.querySelectorAll('input[name="activeSurveillance"]').forEach(r => { r.checked = (r.value === state.activeSurveillance); });
 
   // Techniques
   document.getElementById('techniques').value = state.techniques || DEFAULT_TECHNIQUES;
@@ -1198,12 +1281,14 @@ function renderAll() {
   renderLesions();
 
   // Other findings
-  document.getElementById('svi').value = state.svi || 'none';
-  document.getElementById('bladder').value = state.bladder || 'none';
-  document.getElementById('adjacentOrgan').value = state.adjacentOrgan || 'none';
-  document.getElementById('lymphNode').value = state.lymphNode || 'none';
-  document.getElementById('bone').value = state.bone || 'none';
-  document.getElementById('misc').value = state.misc || 'none';
+  ['svi','bladder','adjacentOrgan','lymphNode','bone','misc'].forEach(f => {
+    document.querySelectorAll('input[name="' + f + 'Toggle"]').forEach(r => { r.checked = (r.value === state[f]); });
+    const textEl = document.getElementById(f + 'Text');
+    if (textEl) {
+      textEl.value = state[f + 'Text'] || '';
+      textEl.style.display = state[f] === 'yes' ? '' : 'none';
+    }
+  });
 }
 
 // =====================================================================
