@@ -841,11 +841,12 @@ function renderSectorPanel(level, lidx) {
   const pzmR_w = hasCZ ? TZL     : CTR;
   const pzmL_x = hasCZ ? TZR     : CTR;
   const pzmL_w = hasCZ ? 200-TZR : CTR;
-  // Text: moved inward so it lands within the visible ellipse area
-  const pzmRtx = hasCZ ? 42  : 70;   // base: center of narrow left strip; mid/apex: inside ellipse
-  const pzmLtx = hasCZ ? 158 : 130;
-  const pzmTy  = 171;
-  const pzmFs  = hasCZ ? '7' : null; // smaller font for narrow base strips
+  // Text: centered in visible ellipse area. Base strips are narrow so x is shifted inward.
+  // At y=162 (matching CZ), ellipse boundary: x≈39.7–160.3; base strip visible centers: 49/151.
+  const pzmRtx = hasCZ ? 49  : 70;
+  const pzmLtx = hasCZ ? 151 : 130;
+  const pzmTy  = 162;
+  const pzmFs  = hasCZ ? '6' : null; // base: smaller font so text fits within narrow visible strip
 
   const zones =
     z(sectorKey(level,'AFS','R'),'afs', 0,     0,      CTR,     AFS_B,       CTR/2,       AFS_B/2,         'AFS'  ) +
