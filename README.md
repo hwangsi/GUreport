@@ -1,5 +1,7 @@
 # GUreport — Prostate MRI Structured Report · PI-RADS v2.1
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Single-file HTML tool for structured prostate MRI reporting. No server, no install, no dependencies — open the file in a browser and start reporting.
 
 ---
