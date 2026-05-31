@@ -1,18 +1,18 @@
-# GUreport — Radiology Structured Report Tools
+# GUreport — Prostate MRI Structured Report · PI-RADS v2.1
 
-Single-file HTML tools for structured radiology reporting. No server, no install, no dependencies — open the file in a browser and start reporting.
+Single-file HTML tool for structured prostate MRI reporting. No server, no install, no dependencies — open the file in a browser and start reporting.
 
 ---
 
-## Tools
+## Tool
 
-### 1. Prostate MRI Structured Report · PI-RADS v2.1
+### Prostate MRI Structured Report · PI-RADS v2.1
 **File:** `prostate_pirads_tool.html`
 
 PI-RADS v2.1 기반 전립선 MRI 판독문 자동 생성 도구.
 
 **Features**
-- **PI-RADS v2.1 38-섹터 맵** — Base / Mid / Apex 3패널, CSS grid, 해부학적 배치 (Ant ↑ · Post ↓ · R ← → L), 클릭으로 다중 섹터 선택
+- **PI-RADS v2.1 38-섹터 맵** — Base / Mid / Apex 3패널, SVG axial diagram, 해부학적 배치 (Ant ↑ · Post ↓ · R ← → L), 클릭으로 다중 섹터 선택
 - **Zone 색상 구분** — PZ (blue) · TZ (green) · CZ (purple) · AFS (gray)
 - **Volume / PSAD 실시간 자동계산** — Ellipsoid formula (L × W × H × 0.52 / 1000)
 - **PI-RADS 점수 수동 입력** (드롭다운 1–5), EPE 3단계 (none / possible / definite)
@@ -70,20 +70,6 @@ Index lesion of PIRADS score 4 at Rt base PZpm, Rt base PZpl with no extra-prost
 
 ---
 
-### 2. Thyroid Ultrasound Report Tool · K-TIRADS 2021
-**File:** `Thyroid Finding Tool - K-TIRADS 2021.html`
-
-K-TIRADS 2021 기반 갑상선 초음파 판독문 자동 생성 도구.
-
-**Features**
-- Thyroid parenchyma / nodule (Right · Left · Isthmus) / Cervical lymph node / Extrathyroidal lesion
-- K-TIRADS 자동 산정 (composition · echogenicity · orientation · margin · calcification)
-- 결절 추가/삭제 (최대 5개 per lobe)
-- 경부 림프절 분류 (Level I–VII, lateral/central, indeterminate/suspicious)
-- localStorage 영속화 · 다크/라이트 테마 · 모바일 대응
-
----
-
 ## PI-RADS v2.1 섹터 맵 구조
 
 ```
@@ -134,5 +120,4 @@ Department of Radiology
 
 ---
 
-*Prostate MRI Structured Report · PI-RADS v2.1*  
-*Thyroid Ultrasound Report Tool · K-TIRADS 2021*
+*Prostate MRI Structured Report · PI-RADS v2.1*
