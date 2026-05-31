@@ -828,11 +828,12 @@ function renderSectorPanel(level, lidx) {
   const TZL=58, CTR=100, TZR=142;
   const AFS_B=51, PZA_B=97, TZP_B=143;
 
+  // fs: inline style font-size (overrides CSS .sc-svg text { font-size:9px })
   function z(key, cls, x, y, w, h, tx, ty, lbl, fs) {
     const sc = sel.includes(key) ? ' selected' : '';
     return '<g class="sc-svg ' + cls + sc + '" data-key="' + key + '" data-lidx="' + lidx + '" onclick="toggleSector(' + lidx + ',\'' + key + '\')">' +
       '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"/>' +
-      '<text x="' + tx + '" y="' + ty + '" text-anchor="middle" dominant-baseline="middle"' + (fs ? ' font-size="' + fs + '"' : '') + '>' + lbl + '</text>' +
+      '<text x="' + tx + '" y="' + ty + '" text-anchor="middle" dominant-baseline="middle"' + (fs ? ' style="font-size:' + fs + 'px"' : '') + '>' + lbl + '</text>' +
       '</g>';
   }
 
@@ -843,10 +844,11 @@ function renderSectorPanel(level, lidx) {
   const pzmL_w = hasCZ ? 200-TZR : CTR;
   // Text: centered in visible ellipse area. Base strips are narrow so x is shifted inward.
   // At y=162 (matching CZ), ellipse boundary: x≈39.7–160.3; base strip visible centers: 49/151.
+  // Base PZpm rendered separately to allow independent font-size (70% of CSS default 9px ≈ 6px).
   const pzmRtx = hasCZ ? 49  : 70;
   const pzmLtx = hasCZ ? 151 : 130;
   const pzmTy  = 162;
-  const pzmFs  = hasCZ ? '4' : null; // base: 70% of previous 6 to avoid CZ overlap and ellipse clipping
+  const pzmFs  = hasCZ ? '6.3' : null; // base only: 70% of 9px CSS default; inline style overrides CSS
 
   const zones =
     z(sectorKey(level,'AFS','R'),'afs', 0,     0,      CTR,     AFS_B,       CTR/2,       AFS_B/2,         'AFS'  ) +
