@@ -847,7 +847,7 @@ function renderSectorPanel(level, lidx) {
   // Base PZpm rendered separately to allow independent font-size (70% of CSS default 9px ≈ 6px).
   const pzmRtx = hasCZ ? 49  : 70;
   const pzmLtx = hasCZ ? 151 : 130;
-  const pzmTy  = 162;
+  const pzmTy  = hasCZ ? 158 : 162; // base: 4px higher than mid/apex
   const pzmFs  = hasCZ ? '6.3' : null; // base only: 70% of 9px CSS default; inline style overrides CSS
 
   const zones =
