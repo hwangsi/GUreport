@@ -115,7 +115,7 @@ open prostate_pirads_tool.html
 
 ## Author
 
-**Hunjong Lim, MD**  
+**Sungil Hwang, MD, PhD**  
 Department of Radiology  
 
 ---
