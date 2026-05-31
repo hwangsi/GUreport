@@ -846,7 +846,7 @@ function renderSectorPanel(level, lidx) {
   const pzmRtx = hasCZ ? 49  : 70;
   const pzmLtx = hasCZ ? 151 : 130;
   const pzmTy  = 162;
-  const pzmFs  = hasCZ ? '6' : null; // base: smaller font so text fits within narrow visible strip
+  const pzmFs  = hasCZ ? '4' : null; // base: 70% of previous 6 to avoid CZ overlap and ellipse clipping
 
   const zones =
     z(sectorKey(level,'AFS','R'),'afs', 0,     0,      CTR,     AFS_B,       CTR/2,       AFS_B/2,         'AFS'  ) +
