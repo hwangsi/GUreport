@@ -851,8 +851,8 @@ function renderSectorPanel(level, lidx) {
   const pzmFs  = hasCZ ? '6.3' : null; // base only: 70% of 9px CSS default; inline style overrides CSS
 
   const zones =
-    z(sectorKey(level,'AFS','R'),'afs', 0,     0,      CTR,     AFS_B,       70,          36,              'AFS'  ) +
-    z(sectorKey(level,'AFS','L'),'afs', CTR,   0,      CTR,     AFS_B,       130,         36,              'AFS'  ) +
+    z(sectorKey(level,'AFS','R'),'afs', 0,     0,      CTR,     AFS_B,       CTR/2,       36,              'AFS'  ) +
+    z(sectorKey(level,'AFS','L'),'afs', CTR,   0,      CTR,     AFS_B,       CTR+CTR/2,   36,              'AFS'  ) +
     z(sectorKey(level,'PZa','R'), 'pz', 0,     AFS_B,  TZL,     PZA_B-AFS_B, TZL/2,       (AFS_B+PZA_B)/2, 'PZa'  ) +
     z(sectorKey(level,'TZa','R'), 'tz', TZL,   AFS_B,  CTR-TZL, PZA_B-AFS_B, (TZL+CTR)/2, (AFS_B+PZA_B)/2, 'TZa'  ) +
     z(sectorKey(level,'TZa','L'), 'tz', CTR,   AFS_B,  TZR-CTR, PZA_B-AFS_B, (CTR+TZR)/2, (AFS_B+PZA_B)/2, 'TZa'  ) +
